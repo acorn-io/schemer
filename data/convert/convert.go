@@ -3,6 +3,7 @@ package convert
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -41,6 +42,18 @@ func ToStringNoTrim(value interface{}) string {
 
 func ToString(value interface{}) string {
 	return strings.TrimSpace(ToStringNoTrim(value))
+}
+
+func ToTimestamp(value interface{}) (int64, error) {
+	str := ToString(value)
+	if str == "" {
+		return 0, errors.New("invalid date")
+	}
+	t, err := time.Parse(time.RFC3339, str)
+	if err != nil {
+		return 0, err
+	}
+	return t.UnixNano() / 1000000, nil
 }
 
 func ToBool(value interface{}) bool {
